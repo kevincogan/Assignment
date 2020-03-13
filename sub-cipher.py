@@ -33,8 +33,6 @@ def analyse_letter_distribution(cipher_text):
             distribution_dict[letter] = 1
         else:
             distribution_dict[letter] += 1
-    if len(distribution_dict.values()) != len(distribution_dict.values()):
-        print("Multiple letters appear the same amount of times! Uh oh.")
     return sorted(distribution_dict,key=distribution_dict.get, reverse=True)
 
 key = makeKey(ALPHABET)
