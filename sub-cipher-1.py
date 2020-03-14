@@ -60,37 +60,75 @@ def single_letter_word(attempt, stored_letters):
 	return attempt
 
 def two_letter_word(attempt):
+	two_letter_freq = []
+	upper_list = []
+	lower_list = []
+	used_list = []
 	attempt1 = attempt.strip().split()
 	i = 0
 	while i != len(attempt1):
-		if len(attempt1[i]) == 2:
+		if len(attempt1[i]) == 2 and attempt1[i] != attempt1[i].upper():
 			#print(attempt1[i])
-			letter_1 = attempt1[i][0]
-			letter_2 = attempt1[i][1]
-			#print(letter_1)
-			two_letters = "of to in it is be as at so we he by or on do if me my up an go no us am"
-			if letter_1 in used_letters:
-				regex = re.escape(letter_1.lower()) + r"."
-				result = re.findall(regex , two_letters)
-				print(result)
+			two_letter_freq.append(attempt1[i])
+			f = frequency_analysis(two_letter_freq)
+			fr = sorted(f,key=f.get, reverse=True)
+		i = i + 1
 
-				char = (result[0][1]).upper()
-				attempt = attempt.replace(attempt1[i][1], char)
-				if char not in used_letters:
-					used_letters.append(char)
+	#print(fr)
+	n = 0
+	for word in fr:
+		first = word[0]
+		second = word[1]
+		if (first == first.upper()) or (second == second.upper()):
+			upper_list.append(word)
+		else:
+			lower_list.append(word)
+	new_list = upper_list + lower_list
+	#print(new_list)
+
+	i = 0
+	while i != len(new_list):
+		letter_1 = new_list[i][0]
+		letter_2 = new_list[i][1]
+		#print(new_list[i])
+		two_letters = "of to in it is be as at so we he by or on do if me my up an go no us am"
+		if letter_1 == (letter_1).upper() and new_list[i] != new_list[i].upper():
+			regex = re.escape(letter_1.lower()) + r"\w"
+			result = re.findall(regex , two_letters)
+			#print(result)
+
+			j = 0
+			while result[j] in used_list:
+				j = j + 1
+
+			char = (result[j][1]).upper()
+			used_list.append(result[j])
+			attempt = attempt.replace(letter_2, char)
+			string = " ". join(new_list)
+			new_list = (string.replace(letter_2, char)).strip().split()
+			if char not in used_letters:
+				used_letters.append(char)
 
 
-			elif letter_2 in used_letters:
-				regex = r"." + re.escape(letter_2.lower())
-				result = re.findall(regex , two_letters)
-				print(result)
+		elif letter_2 == (letter_2).upper() and new_list[i] != new_list[i].upper():
+			regex = r"\w" + re.escape(letter_2.lower())
+			result = re.findall(regex , two_letters)
+			#print(result)
 
-				char = (result[0][0]).upper()
-				attempt = attempt.replace(attempt1[i][0], char)
-				if char not in used_letters:
-					used_letters.append(char)
+			j = 0
+			while result[j] in used_list:
+				j = j + 1
+
+			char = (result[j][0]).upper()
+			used_list.append(result[j])
+			attempt = attempt.replace(letter_1, char)
+			string = " ". join(new_list)
+			new_list = (string.replace(letter_1, char)).strip().split()
+			if char not in used_letters:
+				used_letters.append(char)
 
 		i = i + 1
+	#print(used_list)
 	return attempt
 
 def three_letter_ending_in_E(attempt):
@@ -133,7 +171,9 @@ if __name__ == '__main__':
 #Finding single letter words,[i,a], and check frequency pattern such as if there is full stop as "i" is more likely to appear at the beginning of sentences.
 	attempt = single_letter_word(attempt,stored_letters )
 	attempt = single_letter(attempt, freq_letters, stored_letters)
-	#attempt = two_letter_word(attempt)
 	attempt = three_letter_ending_in_E(attempt)
+	attempt = two_letter_word(attempt)
+	#attempt = two_letter_word(attempt)
+
 	print(attempt)
 	print(used_letters)
