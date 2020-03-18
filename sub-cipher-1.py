@@ -57,6 +57,48 @@ def single_letter(attempt):
 	#print(count)
 	return attempt
 
+def single_letter_front_and_back(attempt):
+	attempt1 = attempt.strip().split()
+	one_letter_front = []
+	one_letter_back = []
+	starting_letters = ["t", "a", "o", "s", "i", "w", "h", "b", "c", "f", "m", "p", "d", "l", "r"]
+	back_letter = ["e", "s", "d", "t", "n", "y"]
+	i = 0
+	while (i != len(attempt1)):
+		if len(attempt1[i]) >= 2 and not attempt1[i].isupper() and attempt1[i].isalpha():
+			one_letter_front.append(attempt1[i][0])
+			one_letter_back.append(attempt[i][len(attempt[i]) -1])
+		i = i + 1
+
+	if len(one_letter_front) != 0:
+		freq_of_one_letter_front = frequency_analysis(one_letter_front)
+		most_freq_front = sorted(freq_of_one_letter_front,key=freq_of_one_letter_front.get, reverse=True)
+		#print(most_freq_front)
+
+		i = 0
+		while i < 2:
+			attempt = attempt.replace(most_freq_front[i], starting_letters[i].upper())
+			if starting_letters[i].upper() not in used_letters:
+				used_letters.append(starting_letters[i].upper())
+			i = i + 1
+
+	if len(one_letter_back) != 0:
+		freq_of_one_letter_back = frequency_analysis(one_letter_back)
+		most_freq_back = sorted(freq_of_one_letter_back,key=freq_of_one_letter_back.get, reverse=True)
+		most_freq_back.remove(" ")
+		#print(most_freq_back)
+		i = 0
+		while i < 1:
+			attempt = attempt.replace(most_freq_back[i], back_letter[i].upper())
+			if back_letter[i].upper() not in used_letters:
+				used_letters.append(back_letter[i].upper())
+			i = i + 1
+	#print(most_freq)
+	#print(one_letter_word)
+	return attempt
+
+
+###############################################################################################################
 #Frequency analysis on one letter words [i, a]. "I" is more likely if it is at the start of a sentence.
 #The first while loop does a frequency analysis on all capital letters the determine "I" as it should be the most frequent.
 
@@ -129,7 +171,7 @@ def two_letter_word(attempt):
 		letter_1 = fr[i][0]
 		letter_2 = fr[i][1]
 		print(fr[i])
-		two_letters = "of to in it is be as at so we he by or on do if me my up an go no us am"
+		two_letters = "of to in it is "
 
 #Case 1: left is upper and right is lower.
 		if letter_1 == (letter_1).upper() and fr[i] != fr[i].upper():
@@ -226,6 +268,7 @@ def double_two_letters(attempt):
 
 def three_letter_ending_in_E(attempt):
 	the = []
+	three_letter_word_ending_E = ["the are one see use"]
 	attempt1 = attempt.strip().split()
 	i = 0
 	while i != len(attempt1):
@@ -240,7 +283,8 @@ def three_letter_ending_in_E(attempt):
 
 	freq = frequency_analysis(the)
 	most_freq = sorted(freq,key=freq.get, reverse=True)
-	#print(most_freq)
+	#print(freq)
+	print(most_freq)
 	if len(most_freq) != 0:
 		if most_freq[0][0] not in used_letters:
 			attempt = attempt.replace(most_freq[0][0], "T")
@@ -275,7 +319,7 @@ def three_letter_word_double_case(attempt):
 		second = word[1]
 		third = word[2]
 		#print(word)
-		if (first == first.upper()) or (second == second.upper()) or (third == third.upper()) and word.isalpha():#########
+		if (first.isupper() or second.isupper() or third.isupper()) and word.isalpha():#########
 			upper_list.append(word)
 		else:
 			lower_list.append(word)
@@ -289,13 +333,13 @@ def three_letter_word_double_case(attempt):
 			letter_1 = new_list[i][0]
 			letter_2 = new_list[i][1]
 			letter_3 = new_list[i][2]
-			#print(new_list[i])
+			print(new_list[i])
 
 #Double case 1: One capital on the left and centre.
 			if letter_1 == (letter_1).upper() and letter_2 == (letter_2).upper() and new_list[i] != new_list[i].upper():
 				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w"
 				result = re.findall(regex , three_letters)
-				#print(result)
+				print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -315,7 +359,7 @@ def three_letter_word_double_case(attempt):
 			elif letter_1 == (letter_1).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
 				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower())
 				result = re.findall(regex , three_letters)
-				#print(result)
+				print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -335,7 +379,7 @@ def three_letter_word_double_case(attempt):
 			elif letter_2 == (letter_2).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
 				regex =  r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower())
 				result = re.findall(regex , three_letters)
-				#print(result)
+				print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -360,7 +404,8 @@ def three_letter_word_double_case(attempt):
 	#print(upper_list)
 	#print(lower_list)
 	#print(used_list)
-	#print(new_list)	
+	#print(new_list)
+
 	return attempt
 
 #currently not in use as not needed
@@ -607,6 +652,118 @@ def three_letter_endings(attempt):
 	#print(result)
 	return attempt
 
+def four_letter_word(attempt):
+	attempt1 = attempt.strip().split()
+	four_letter_list = []
+	four_letters = "that with have this will your from they know want been good much some time"
+	i = 0
+	while i != len(attempt1):
+		if len(attempt1[i]) == 4 and not attempt1[i].isupper() and (attempt1[i]).isalpha():
+			four_letter_list.append(attempt1[i])
+			freq_4 = frequency_analysis(four_letter_list)
+			most_freq = sorted(freq_4,key=freq_4.get, reverse=True)
+		i = i + 1
+
+	#print(fr)
+	n = 0
+	upper_list = []
+	lower_list = []
+	for word in most_freq:
+		first = word[0]
+		second = word[1]
+		third = word[2]
+		fourth = word[3]
+		#print(word)
+		if (first.isupper() or second.isupper() or third.isupper() or fourth.isupper()) and word.isalpha():#########
+			upper_list.append(word)
+		else:
+			lower_list.append(word)
+	new_list = upper_list + lower_list
+################################################
+	i = 0
+	k = 0
+	while k != 2: #####iterated twice over the list.
+		i = 0
+		while i != len(new_list):
+			letter_1 = new_list[i][0]
+			letter_2 = new_list[i][1]
+			letter_3 = new_list[i][2]
+			letter_4 = new_list[i][3]
+			print(new_list[i])
+
+#Triple case 1: One lower case on the far left and all other are upper.
+			if letter_2.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
+				regex = r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + re.escape(letter_4.lower())
+				result = re.findall(regex , four_letters)
+				print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][0].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][0].upper() not in used_letters:
+						char = (result[j][0]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_1, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_1, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
+#Double case 2: One capital on the left and far right.
+#			elif letter_1 == (letter_1).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
+#				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower())
+#				result = re.findall(regex , three_letters)
+#				print(result)
+#
+#				if len(result) != 0:
+#					j = 0
+#					while result[j][1].upper() in used_letters and j < len(result) -1:
+#						j = j + 1
+#
+#					if result[j][1].upper() not in used_letters:
+#						char = (result[j][1]).upper()
+#						used_list.append(result[j])
+#						attempt = attempt.replace(letter_2, char)
+#						string = " ". join(new_list)
+#						new_list = (string.replace(letter_2, char)).strip().split()
+#						if char not in used_letters:
+#							used_letters.append(char)
+#
+#Double case 3: One capital in the centre and far right.
+#			elif letter_2 == (letter_2).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
+#				regex =  r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower())
+#				result = re.findall(regex , three_letters)
+#				print(result)
+#
+#				if len(result) != 0:
+#					j = 0
+##					while result[j][0].upper() in used_letters and j < len(result) -1:
+#						j = j + 1
+#
+#					if result[j][0].upper() not in used_letters:
+#						char = (result[j][0]).upper()
+#						used_list.append(result[j])
+#						attempt = attempt.replace(letter_1, char)
+#						string = " ". join(new_list)
+#						new_list = (string.replace(letter_1, char)).strip().split()
+#						if char not in used_letters:
+#							used_letters.append(char)
+			i = i + 1
+#			#print(new_list)
+#			#print(used_list)
+#			#print(used_letters)
+#			#print("------------------------------------------------------------------")
+		k = k + 1
+#
+#	#print(upper_list)
+#	#print(lower_list)
+#	#print(used_list)
+#	#print(new_list)
+#
+#	#return attempt
+
 
 ##################################################################
 if __name__ == '__main__':
@@ -621,13 +778,15 @@ if __name__ == '__main__':
 #Finding single letter words,[i,a], and check frequency pattern such as if there is full stop as "i" is more likely to appear at the beginning of sentences.
 	attempt = single_letter(attempt)
 	attempt = single_letter_word(attempt)
-	#attempt = three_letter_ending_in_E(attempt)
-	#attempt = three_letter_word_double_case(attempt)
-	#attempt = two_letter_word(attempt)
-	##attempt = ending_in_ing(attempt) #Redundant as three_letter_endings does this except for all cases.
+	attempt = single_letter_front_and_back(attempt)
+	attempt = two_letter_word(attempt)
+	
+	attempt = three_letter_word_double_case(attempt)
 	#attempt = three_letter_endings(attempt)
+	##attempt = ending_in_ing(attempt) #Redundant as three_letter_endings does this except for all cases.
 	#attempt = double_two_letters(attempt)
-
 	print(attempt)
 	print(used_list)
 	print(used_letters)
+	#attempt = four_letter_word(attempt) #Put near the end maybe after three_word_letters
+	#attempt = three_letter_ending_in_E(attempt)
