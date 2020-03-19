@@ -120,7 +120,7 @@ def single_letter_word(attempt):
 	#print(most_freq)
 	#print(one_letter_word)
 
-	if len(most_freq) > 1:
+	if len(one_letter_word) > 1:
 		attempt = attempt.replace(most_freq[1], "A")
 		if "A" not in used_letters:
 			used_letters.append("A")
@@ -139,7 +139,35 @@ def single_letter_word(attempt):
 #		if "T" in used_letters:
 #			attempt = attempt.replace("t", "T")
 	return attempt
+##########################################################################
 
+def q_followed_by_u(attempt):
+	attempt1 = attempt.strip().split()
+	q_list = []
+	new_q = []
+	for word in attempt1:
+		if "U" in word and not word.isupper():
+			q_list.append(word)
+	freq_analysis_on_u = frequency_analysis(q_list)
+	most_freq = sorted(freq_analysis_on_u,key=freq_analysis_on_u.get, reverse=True)
+
+	for word in most_freq:
+		u_index = word.index("U")
+		#print(u_index)
+		if word[u_index - 1].islower():
+			new_q.append(word[u_index -1])
+		q_freq = frequency_analysis(new_q)
+		most_freq_u = sorted(q_freq,key=q_freq.get, reverse=True)
+
+		if most_freq_u != 0:
+		 	attempt = attempt.replace(most_freq_u[0], "Q")
+		 	if "Q" not in used_letters:
+		 		used_letters.append("Q")
+	#print(most_freq_u)
+	return attempt
+
+
+##########################################################################
 def two_letter_word(attempt):
 	two_letter_freq = []
 	upper_list = []
@@ -170,14 +198,14 @@ def two_letter_word(attempt):
 	while i != len(fr):
 		letter_1 = fr[i][0]
 		letter_2 = fr[i][1]
-		print(fr[i])
+		#print(fr[i])
 		two_letters = "of to in it is "
 
 #Case 1: left is upper and right is lower.
 		if letter_1 == (letter_1).upper() and fr[i] != fr[i].upper():
 			regex = re.escape(letter_1.lower()) + r"\w"
 			result = re.findall(regex , two_letters)
-			print(result)
+			#print(result)
 			if len(result) != 0:
 				j = 0
 				while result[j][1].upper() in used_letters and j < len(result) -1:
@@ -196,7 +224,7 @@ def two_letter_word(attempt):
 		elif letter_2 == (letter_2).upper() and fr[i] != fr[i].upper():
 			regex = r"\w" + re.escape(letter_2.lower())
 			result = re.findall(regex , two_letters)
-			print(result)
+			#print(result)
 
 			if len(result) != 0:
 				j = 0
@@ -284,7 +312,7 @@ def three_letter_ending_in_E(attempt):
 	freq = frequency_analysis(the)
 	most_freq = sorted(freq,key=freq.get, reverse=True)
 	#print(freq)
-	print(most_freq)
+	#print(most_freq)
 	if len(most_freq) != 0:
 		if most_freq[0][0] not in used_letters:
 			attempt = attempt.replace(most_freq[0][0], "T")
@@ -333,13 +361,13 @@ def three_letter_word_double_case(attempt):
 			letter_1 = new_list[i][0]
 			letter_2 = new_list[i][1]
 			letter_3 = new_list[i][2]
-			print(new_list[i])
+			#print(new_list[i])
 
 #Double case 1: One capital on the left and centre.
 			if letter_1 == (letter_1).upper() and letter_2 == (letter_2).upper() and new_list[i] != new_list[i].upper():
 				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w"
 				result = re.findall(regex , three_letters)
-				print(result)
+				#print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -359,7 +387,7 @@ def three_letter_word_double_case(attempt):
 			elif letter_1 == (letter_1).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
 				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower())
 				result = re.findall(regex , three_letters)
-				print(result)
+				#print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -379,7 +407,7 @@ def three_letter_word_double_case(attempt):
 			elif letter_2 == (letter_2).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
 				regex =  r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower())
 				result = re.findall(regex , three_letters)
-				print(result)
+				#print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -689,13 +717,13 @@ def four_letter_word(attempt):
 			letter_2 = new_list[i][1]
 			letter_3 = new_list[i][2]
 			letter_4 = new_list[i][3]
-			print(new_list[i])
+			#print(new_list[i])
 
 #Triple case 1: One lower case on the far left and all other are upper.
 			if letter_2.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
 				regex = r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + re.escape(letter_4.lower())
 				result = re.findall(regex , four_letters)
-				print(result)
+				#print(result)
 
 				if len(result) != 0:
 					j = 0
@@ -711,45 +739,66 @@ def four_letter_word(attempt):
 						if char not in used_letters:
 							used_letters.append(char)
 
-#Double case 2: One capital on the left and far right.
-#			elif letter_1 == (letter_1).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
-#				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower())
-#				result = re.findall(regex , three_letters)
-#				print(result)
-#
-#				if len(result) != 0:
-#					j = 0
-#					while result[j][1].upper() in used_letters and j < len(result) -1:
-#						j = j + 1
-#
-#					if result[j][1].upper() not in used_letters:
-#						char = (result[j][1]).upper()
-#						used_list.append(result[j])
-#						attempt = attempt.replace(letter_2, char)
-#						string = " ". join(new_list)
-#						new_list = (string.replace(letter_2, char)).strip().split()
-#						if char not in used_letters:
-#							used_letters.append(char)
-#
-#Double case 3: One capital in the centre and far right.
-#			elif letter_2 == (letter_2).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
-#				regex =  r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower())
-#				result = re.findall(regex , three_letters)
-#				print(result)
-#
-#				if len(result) != 0:
-#					j = 0
-##					while result[j][0].upper() in used_letters and j < len(result) -1:
-#						j = j + 1
-#
-#					if result[j][0].upper() not in used_letters:
-#						char = (result[j][0]).upper()
-#						used_list.append(result[j])
-#						attempt = attempt.replace(letter_1, char)
-#						string = " ". join(new_list)
-#						new_list = (string.replace(letter_1, char)).strip().split()
-#						if char not in used_letters:
-#							used_letters.append(char)
+#Triple case 2: Upper on the far left followed by a lower then two uppers.
+			if letter_1.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower()) + re.escape(letter_4.lower())
+				result = re.findall(regex , four_letters)
+				#print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][1].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][1].upper() not in used_letters:
+						char = (result[j][1]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_2, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_2, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
+#Triple 3: two letters on the left are upper followed by a lower than an upper.
+			if letter_1.isupper() and letter_2.isupper() and letter_4.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_3.lower()) + r"\w" + re.escape(letter_4.lower())
+				result = re.findall(regex , four_letters)
+				#print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][2].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][2].upper() not in used_letters:
+						char = (result[j][2]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_3, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_3, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
+#Triple 4: three letters on the left are upper followed by a lower.
+			if letter_1.isupper() and letter_2.isupper() and letter_3.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + r"\w"
+				result = re.findall(regex , four_letters)
+				#print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][3].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][3].upper() not in used_letters:
+						char = (result[j][3]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_4, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_4, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
 			i = i + 1
 #			#print(new_list)
 #			#print(used_list)
@@ -762,11 +811,13 @@ def four_letter_word(attempt):
 #	#print(used_list)
 #	#print(new_list)
 #
-#	#return attempt
+	return attempt
 
 
 ##################################################################
 if __name__ == '__main__':
+	import time
+	start = time.perf_counter()
 	f = open("shite.txt", "r")
 	encrypted_message = f.read()
 	attempt = encrypted_message.lower()
@@ -780,13 +831,20 @@ if __name__ == '__main__':
 	attempt = single_letter_word(attempt)
 	attempt = single_letter_front_and_back(attempt)
 	attempt = two_letter_word(attempt)
-	
 	attempt = three_letter_word_double_case(attempt)
-	#attempt = three_letter_endings(attempt)
-	##attempt = ending_in_ing(attempt) #Redundant as three_letter_endings does this except for all cases.
-	#attempt = double_two_letters(attempt)
+	attempt = q_followed_by_u(attempt)
+	attempt = four_letter_word(attempt)
+
 	print(attempt)
 	print(used_list)
 	print(used_letters)
+	#attempt = three_letter_endings(attempt)
+	##attempt = ending_in_ing(attempt) #Redundant as three_letter_endings does this except for all cases.
+	#attempt = double_two_letters(attempt)
 	#attempt = four_letter_word(attempt) #Put near the end maybe after three_word_letters
 	#attempt = three_letter_ending_in_E(attempt)
+
+	finish = time.perf_counter()
+	#print("Start: ", start)
+	#print("Finish: ", finish)
+	print(f"Finished in {round(finish-start, 2)} second(s)")
