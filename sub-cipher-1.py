@@ -828,12 +828,12 @@ if __name__ == '__main__':
 
 #Finding single letter words,[i,a], and check frequency pattern such as if there is full stop as "i" is more likely to appear at the beginning of sentences.
 	attempt = single_letter(attempt)
-	attempt = single_letter_word(attempt)
-	attempt = single_letter_front_and_back(attempt)
-	attempt = two_letter_word(attempt)
-	attempt = three_letter_word_double_case(attempt)
-	attempt = q_followed_by_u(attempt)
-	attempt = four_letter_word(attempt)
+	#attempt = single_letter_word(attempt)
+	#attempt = single_letter_front_and_back(attempt)
+	#attempt = two_letter_word(attempt)
+	#attempt = three_letter_word_double_case(attempt)
+	#attempt = q_followed_by_u(attempt)
+	#attempt = four_letter_word(attempt)
 
 	print(attempt)
 	print(used_list)
