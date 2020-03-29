@@ -1,5 +1,5 @@
 import re
-characters = "1234567890@%#'$[]/()*:,!;-_\n.?}{`<>+&‘—”“’" + '"=£éàêöæñ'
+characters = "1234567890@%#'$[]/()*:,!;-_\n.?}{`<>+&‘—”“’" + '"=£éàêöêôæñ'
 
 #This will find the frequency analysis of the input that could be words or letters. The diction is a temporary dictiona that needs to be assigned a variable name in the command area at the very bottom
 def frequency_analysis(input):
@@ -331,7 +331,7 @@ def two_letter_ending_in_A(attempt):
 				if "D" not in used_letters:
 					used_letters.append("D")
 
-			elif most_freq[i][0] == "A" and most_freq[i][2] =="E":
+			elif most_freq[i][0] == "A" and most_freq[i][2] == "E":
 				attempt = attempt.replace(most_freq[i][1], "R")
 				if "R" not in used_letters:
 					used_letters.append("R")
@@ -712,16 +712,16 @@ def three_letter_endings(attempt):
 def four_letter_word(attempt):
 	attempt1 = attempt.strip().split()
 	four_letter_list = []
-	four_letters = "that with have this will your from they know want been good much some time"
+	four_letters = "that with have this will your from they know want been good much some time just"
 	i = 0
 	while i != len(attempt1):
-		if len(attempt1[i]) == 4 and not attempt1[i].isupper() and (attempt1[i]).isalpha():
+		if len(attempt1[i]) == 4 and not attempt1[i].isupper() and attempt1[i].isalpha():
 			four_letter_list.append(attempt1[i])
 			freq_4 = frequency_analysis(four_letter_list)
 			most_freq = sorted(freq_4,key=freq_4.get, reverse=True)
 		i = i + 1
 
-	#print(fr)
+	#print(most_freq)
 	n = 0
 	upper_list = []
 	lower_list = []
@@ -790,7 +790,7 @@ def four_letter_word(attempt):
 
 #Triple 3: two letters on the left are upper followed by a lower than an upper.
 			if letter_1.isupper() and letter_2.isupper() and letter_4.isupper() and not new_list[i].isupper():
-				regex = re.escape(letter_1.lower()) + re.escape(letter_3.lower()) + r"\w" + re.escape(letter_4.lower())
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w" + re.escape(letter_4.lower())
 				result = re.findall(regex , four_letters)
 				#print(result)
 
@@ -864,31 +864,104 @@ def ending_een(attempt):
 
 	if len(most_freq) != 0:
 		i = 0
-		while i < 2:
-			if len(most_freq[i]) == 4 and most_freq[i][1] == most_freq[i][2] and most_freq[i][3]:
-				attempt = attempt.replace(most_freq[i][0], "B")
-				if "B" not in used_letters:
-					used_letters.append("B")
-					joiner = " ".join(most_freq)
-					joiner = joiner.replace(most_freq[i][0], "B")
-					most_freq = joiner.split()
+		if len(most_freq[i]) == 4 and most_freq[i][1] == most_freq[i][2] and most_freq[i][3]:
+			attempt = attempt.replace(most_freq[i][0], "B")
+			if "B" not in used_letters:
+				used_letters.append("B")
+				joiner = " ".join(most_freq)
+				joiner = joiner.replace(most_freq[i][0], "B")
+				most_freq = joiner.split()
 
-			elif len(most_freq[i]) == 7 and most_freq[i][1:3] == "ET":
-				attempt = attempt.replace(most_freq[i][3], "W")
-				if "W" not in used_letters:
-					used_letters.append("W")
+#		while i < len(most_freq):
+#			if len(most_freq[i]) == 7 and most_freq[i][1:3] == "ET":
+#				attempt = attempt.replace(most_freq[i][3], "W")
+#				if "W" not in used_letters:
+#					used_letters.append("W")
+#			i = i + 1
 
 
-			i = i + 1
 #	#print(most_freq)
 	return attempt
+
+def last_letter(attempt):
+	attempt1 = attempt.strip().split()
+	last_list = []
+	last_letter = []
+
+	for word in attempt1:
+		if not word.isupper() and word.isalpha():
+			i = 0
+			while word[i].isupper():
+				i = i + 1
+				last_list.append(word[i])
+			if word[i] not in last_letter:
+				last_letter.append(word[i])
+	#print(last_letter)
+
+	if len(last_letter) >= 2:
+		counted_1 = last_list.count(last_letter[0])
+		counted_2 = last_list.count(last_letter[1])
+		if counted_1 > counted_2:
+			attempt = attempt.replace(last_letter[1], "Z")
+			if "Z" not in used_letters:
+				used_letters.append("Z")
+			attempt = attempt.replace(last_letter[0], "X")
+			if "X" not in used_letters:
+				used_letters.append("X")
+		else:
+			attempt = attempt.replace(last_letter[1], "X")
+			if "X" not in used_letters:
+				used_letters.append("X")
+			attempt = attempt.replace(last_letter[0], "Z")
+			if "Z" not in used_letters:
+				used_letters.append("Z")
+
+	elif len(last_letter) == 1:
+		alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+		attempt = attempt.replace(last_letter[0], "X")
+		if "X" not in used_letters:
+			used_letters.append("X")
+
+		i = 0
+		while alphabet[i] in used_letters:
+			i = i + 1
+		attempt = attempt.replace(last_letter[1], "Z")
+		if "Z" not in used_letters:
+			used_letters.append("Z")
+
+
+	#print(counted_1)
+	#print(counted_2)
+
+	return attempt
+
+def finding_H_by_THE(attempt):
+	attempt1 = attempt.strip().split()
+	T_E = []
+	last_letter = []
+
+	for word in attempt1:
+		if len(word) == 3 and word[0] == "T" and word[2] == "E" and not word.isupper() and word.isalpha():
+			T_E.append(word)
+
+	freq = frequency_analysis(T_E)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+	if len(most_freq) > 0:
+		attempt = attempt.replace(most_freq[0][1], "H")
+		if "H" not in used_letters:
+			used_letters.append("H")
+
+
+	#print(most_freq)
+	return attempt
+
 
 
 ##################################################################
 if __name__ == '__main__':
 	import time
 	start = time.perf_counter()
-	f = open("sample.txt", "r")
+	f = open("a_house_to_let.txt", "r")
 	encrypted_message = f.read()
 	attempt = encrypted_message.lower()
 	used_letters = []
@@ -900,18 +973,21 @@ if __name__ == '__main__':
 	attempt = single_letter(attempt)
 	attempt = single_letter_word(attempt)
 	attempt = single_letter_front_and_back(attempt)
+	attempt = finding_H_by_THE(attempt)
 	attempt = two_letter_ending_in_A(attempt)
 	attempt = ending_een(attempt)
 
 
 	attempt = two_letter_word(attempt)
 	attempt = three_letter_word_double_case(attempt)
-	attempt = q_followed_by_u(attempt)
 	attempt = four_letter_word(attempt)
+	attempt = q_followed_by_u(attempt)
+	attempt = last_letter(attempt)
 
 	print(attempt)
 	print(used_list)
 	print(used_letters)
+	print("Number of used letters is: " + str(len(used_letters)))
 	#attempt = three_letter_endings(attempt)
 	##attempt = ending_in_ing(attempt) #Redundant as three_letter_endings does this except for all cases.
 	#attempt = double_two_letters(attempt)
