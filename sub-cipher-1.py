@@ -1,5 +1,13 @@
 import re
+import string
 characters = "1234567890@%#'$[]/()*:,!;-_\n.?}{`<>+&‘—”“’" + '"=£éàêöêôæñ'
+import time
+
+def strip_punctuation(attempt):
+	for char in characters:
+		if char in attempt:
+			attempt = attempt.replace(char, "")
+	return attempt
 
 #This will find the frequency analysis of the input that could be words or letters. The diction is a temporary dictiona that needs to be assigned a variable name in the command area at the very bottom
 def frequency_analysis(input):
@@ -14,14 +22,14 @@ def frequency_analysis(input):
 
 
 #Find the frequency of letters in the text and replace them with the most common letters in english [E,T,A,O,I,N]. Check if there is a big enough difference betten the frequency of words in the text as this will make predictions more accurate.
-def single_letter(attempt):
-	attempt_count = attempt.lower()
-	for char in characters:
-		if char in attempt_count:
-			attempt_count = attempt_count.replace(char, "")
+def single_letter(attempt, freq_single_letters):
+	attempt = attempt.lower()
+#strip all punctuation###############################
+#	for char in characters:
+#		if char in attempt:
+#			attempt = attempt.replace(char, "")
 #			print(char)
 
-	freq_single_letters = frequency_analysis(attempt_count)
 	sorted_freq_letters = sorted(freq_single_letters,key=freq_single_letters.get, reverse=True)
 	sorted_freq_letters.remove(" ")
 #	print(freq_single_letters)
@@ -30,7 +38,7 @@ def single_letter(attempt):
 
 
 	count = 0
-	for letter in attempt_count:
+	for letter in attempt:
 		if letter.isalpha():
 			count = count + 1
 #	print("Total: " + str(count))
@@ -43,15 +51,15 @@ def single_letter(attempt):
 		attempt = attempt.replace(sorted_freq_letters[0], "E")
 		used_letters.append("E")
 
-	if (((((freq_single_letters[sorted_freq_letters[1]]/ count)*100) - (freq_single_letters[sorted_freq_letters[2]]/ count)*100)) >= 1):
-		attempt = attempt.replace(sorted_freq_letters[1], "T")
-		used_letters.append("T")
+#	if (((((freq_single_letters[sorted_freq_letters[1]]/ count)*100) - (freq_single_letters[sorted_freq_letters[2]]/ count)*100)) >= 1):
+#		attempt = attempt.replace(sorted_freq_letters[1], "T")
+#		used_letters.append("T")
 
 #	if ((stored_letters[freq_letters[2]] - stored_letters[freq_letters[3]]) >= 20 ):
 #		attempt = attempt.replace(freq_letters[2], "A")
 #		used_letters.append("A")
 #	if ((stored_letters[freq_letters[3]] - stored_letters[freq_letters[4]]) >= 25 ):
-#		attempt = attempt.replace(freq_letters[3], "O")
+#		attempt = attempt.replace(freq_letters[3], "I")
 #		used_letters.append("O")
 
 	#print(count)
@@ -76,7 +84,7 @@ def single_letter_front_and_back(attempt):
 		#print(most_freq_front)
 
 		i = 0
-		while i < 2:
+		while i < 1:
 			attempt = attempt.replace(most_freq_front[i], starting_letters[i].upper())
 			if starting_letters[i].upper() not in used_letters:
 				used_letters.append(starting_letters[i].upper())
@@ -102,29 +110,59 @@ def single_letter_front_and_back(attempt):
 #Frequency analysis on one letter words [i, a]. "I" is more likely if it is at the start of a sentence.
 #The first while loop does a frequency analysis on all capital letters the determine "I" as it should be the most frequent.
 
+
 def single_letter_word(attempt):
 	attempt1 = attempt.strip().split()
 	one_letter_word = []
 	i = 0
 	while (i != len(attempt1)):
-		if len(attempt1[i]) == 1 and attempt1[i - 1][len(attempt1[i -1]) -1] == "." and attempt1[i].isalpha():
+		if len(attempt1[i]) == 1  and attempt1[i].isalpha():
 			one_letter_word.append(attempt1[i])
-
 		i = i + 1
+	#print(one_letter_word)
 
 	if len(one_letter_word) != 0:
 		freq_of_one_letter_words = frequency_analysis(one_letter_word)
 		most_freq = sorted(freq_of_one_letter_words,key=freq_of_one_letter_words.get, reverse=True)
-		attempt = attempt.replace(most_freq[0], "I")
-		if "I" not in used_letters:
-			used_letters.append("I")
-	#print(most_freq)
-	#print(one_letter_word)
 
-	if len(one_letter_word) > 1:
-		attempt = attempt.replace(most_freq[1], "A")
+
+		attempt = attempt.replace(most_freq[0], "A")
 		if "A" not in used_letters:
 			used_letters.append("A")
+
+		#print(len(one_letter_word))
+		#print(freq_of_one_letter_words)
+		#print(most_freq)
+		if len(most_freq) > 1:
+			attempt = attempt.replace(most_freq[1], "I")
+			if "I" not in used_letters:
+				used_letters.append("I")
+
+	attempt1 = attempt.strip().split()
+	new_one_letter_word = []
+	i = 0
+	while (i != len(attempt1)):
+		if len(attempt1[i]) == 1 and attempt1[i - 1][len(attempt1[i -1]) -1] == "." and attempt1[i].isalpha():
+			new_one_letter_word.append(attempt1[i])
+
+		i = i + 1
+	#print(new_one_letter_word)
+
+	freq_of_one_letter_words = frequency_analysis(new_one_letter_word)
+	most_freq_2 = sorted(freq_of_one_letter_words,key=freq_of_one_letter_words.get, reverse=True)
+	#print(most_freq_2)
+	#print(most_freq)
+
+	if len(most_freq_2) > 0:
+		if most_freq_2[0] != "I":
+			attempt = attempt.replace("I", "---")
+			if len(most_freq) >= 2:
+				attempt = attempt.replace("A", "I")
+			attempt = attempt.replace("---", "A")
+			if "A" not in used_letters:
+				used_letters.append("A")
+
+	return attempt
 #------------------------------------------------------------
 #		i = 0
 #		while (i != len(attempt1)):
@@ -139,7 +177,7 @@ def single_letter_word(attempt):
 #			attempt = attempt.replace("e", "E")
 #		if "T" in used_letters:
 #			attempt = attempt.replace("t", "T")
-	return attempt
+	#return attempt
 ##########################################################################
 
 def q_followed_by_u(attempt):
@@ -151,14 +189,31 @@ def q_followed_by_u(attempt):
 			q_list.append(word)
 	freq_analysis_on_u = frequency_analysis(q_list)
 	most_freq = sorted(freq_analysis_on_u,key=freq_analysis_on_u.get, reverse=True)
+	#print(most_freq)
 
 	for word in most_freq:
-		u_index = word.index("U")
-		#print(u_index)
-		if word[u_index - 1].islower():
-			new_q.append(word[u_index -1])
+		index = 0
+		if word.count("U") >= 2:
+			for letter in word:
+				if letter == "U":
+					if index >= 1:
+						new_q.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("U") == 1:
+			for letter in word:
+				if letter == "U":
+					if index >= 1:
+						new_q.append(word[index - 1])
+
+				index = index + 1
+
+
 		q_freq = frequency_analysis(new_q)
 		most_freq_u = sorted(q_freq,key=q_freq.get, reverse=True)
+		print(most_freq_u)
+
 
 		if most_freq_u != 0:
 		 	attempt = attempt.replace(most_freq_u[0], "Q")
@@ -200,7 +255,7 @@ def two_letter_word(attempt):
 		letter_1 = fr[i][0]
 		letter_2 = fr[i][1]
 		#print(fr[i])
-		two_letters = "of to in it is be as at so we he by or on do if me my up an go us am"
+		two_letters = "of to in it is as at so by or on do if my up an go us"
 
 #Case 1: left is upper and right is lower.
 		if letter_1 == (letter_1).upper() and fr[i] != fr[i].upper():
@@ -251,7 +306,7 @@ def double_two_letters(attempt):
 	attempt1 = attempt.strip().split()
 	j = 0
 	double_letters = []
-	same_letters_list = ["ll ss ee oo tt ff pp rr mm cc nn dd gg ii bb aa zz xx uu hh"]
+	same_letters_list = ["ee", "ll", "ss", "oo", "tt", "ff" "rr", "nn", "pp", "cc"]
 	for word in attempt1:
 		i = 0
 		while i < len(word) -1:
@@ -259,33 +314,36 @@ def double_two_letters(attempt):
 			second_letter = word[i + 1]
 			togther_letters = first_letter + second_letter
 			if first_letter == second_letter and togther_letters != togther_letters.upper():
-				double_letters.append(word)
+				double_letters.append(first_letter)
 				break
 			i = i + 1
+	#print(double_letters)
 
-	if len(double_letters) != 0:
-		for word in double_letters:
-			i = 0
-			while i < len(word) -1:
-				first_letter = word[i]
-				second_letter = word[i + 1]
-				togther_letters = first_letter + second_letter
-				if first_letter == second_letter and togther_letters != togther_letters.upper():
+	freq = frequency_analysis(double_letters)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+	#print(freq)
+	#print(most_freq)
+	#print("________________________________________________________________________")
 
-					while same_letters_list[j][0].upper() in used_letters and j < len(same_letters_list) -1:
-						j = j + 1
 
-					if same_letters_list[j][0].upper() not in used_letters:
-						char = same_letters_list[j][0].upper()
-						used_list.append(same_letters_list[j][0] + same_letters_list[j][0])
-						attempt = attempt.replace(first_letter, char)
-						#string = " ". join(new_list)
-						#new_list = (string.replace(letter_1, char)).strip().split()
-						if char not in used_letters:
-							used_letters.append(char)
-		
-					break
-				i = i + 1
+	if len(most_freq) != 0:
+		i = 0
+		while i <= len(most_freq) - 1:
+			j = 0
+			while same_letters_list[j][0].upper() in used_letters and j < len(same_letters_list) -1:
+				j = j + 1
+			#print(same_letters_list[j])
+			if same_letters_list[j][0].upper() not in used_letters:
+				char = same_letters_list[j][0].upper()
+				used_list.append(same_letters_list[j][0] + same_letters_list[j][0])
+				attempt = attempt.replace(most_freq[i], char)
+				#string = " ". join(new_list)
+				#new_list = (string.replace(letter_1, char)).strip().split()
+				if char not in used_letters:
+					used_letters.append(char)
+			i = i + 1
+
+			#print(most_freq)
 	return attempt
 
 
@@ -318,47 +376,49 @@ def two_letter_ending_in_A(attempt):
 
 	if len(most_freq) != 0:
 		i = 0
-		while i < 4:
-			if "N" not in used_letters or "D" not in used_letters:
-				attempt = attempt.replace(most_freq[i][1], "N")
-				if "N" not in used_letters:
-					used_letters.append("N")
-					joiner = " ".join(most_freq)
-					joiner = joiner.replace(most_freq[i][1], "N")
-					most_freq = joiner.split()
+		if len(most_freq) > 0:
+			while i < 1:
+				if "N" not in used_letters or "D" not in used_letters:
+					attempt = attempt.replace(most_freq[i][1], "N")
+					if "N" not in used_letters:
+						used_letters.append("N")
+						joiner = " ".join(most_freq)
+						joiner = joiner.replace(most_freq[i][1], "N")
+						most_freq = joiner.split()
 
-				attempt = attempt.replace(most_freq[i][2], "D")
-				if "D" not in used_letters:
-					used_letters.append("D")
+					attempt = attempt.replace(most_freq[i][2], "D")
+					if "D" not in used_letters:
+						used_letters.append("D")
 
-			elif most_freq[i][0] == "A" and most_freq[i][2] == "E":
-				attempt = attempt.replace(most_freq[i][1], "R")
-				if "R" not in used_letters:
-					used_letters.append("R")
+#				elif most_freq[i][0] == "A" and most_freq[i][2] == "E":
+#					attempt = attempt.replace(most_freq[i][1], "R")
+#					if "R" not in used_letters:
+#						used_letters.append("R")
+#
+#				elif most_freq[i][1] == most_freq[i][2]:
+#					attempt = attempt.replace(most_freq[i][1], "L")
+#					attempt = attempt.replace(most_freq[i][2], "L")
+#					if "L" not in used_letters:
+#						used_letters.append("L")
+#
+#				elif most_freq[i][0] == "A" and most_freq[i][1] == "N" and not most_freq[i].isupper():
+#					attempt = attempt.replace(most_freq[i][2], "Y")
+#					if "Y" not in used_letters:
+#						used_letters.append("Y")
+	#		if len(most_freq) > 1:
+	#			attempt = attempt.replace(most_freq[1][0], "S")
+	#			used_letters.append("S")
 
-			elif most_freq[i][1] == most_freq[i][2]:
-				attempt = attempt.replace(most_freq[i][1], "L")
-				attempt = attempt.replace(most_freq[i][2], "L")
-				if "L" not in used_letters:
-					used_letters.append("L")
 
-			elif most_freq[i][0] == "A" and most_freq[i][1] == "N" and not most_freq[i].isupper():
-				attempt = attempt.replace(most_freq[i][2], "Y")
-				if "Y" not in used_letters:
-					used_letters.append("Y")
-#		if len(most_freq) > 1:
-#			attempt = attempt.replace(most_freq[1][0], "S")
-#			used_letters.append("S")
-
-
-			i = i + 1
+				i = i + 1
 #	#print(most_freq)
 	return attempt
 
-def three_letter_word_double_case(attempt):
+def three_letter_word_double_case(attempt, words):
+	most_freq = ""
 	attempt1 = attempt.strip().split()
 	three_letter_list = []
-	three_letters = "the and for are but not you all any can had her was one our out day get has him his how man new now old see two way who boy did its let put say she use"
+	three_letters = words #"the and for are but not you all any can had her was one our out day get has him his how man new now old see two way who boy did its let put say she use"
 	i = 0
 	while i != len(attempt1):
 		if len(attempt1[i]) == 3 and attempt1[i] != attempt1[i].upper() and (attempt1[i]).isalpha():
@@ -709,10 +769,12 @@ def three_letter_endings(attempt):
 	#print(result)
 	return attempt
 
-def four_letter_word(attempt):
+def four_letter_word(attempt, words):
+	most_freq = ""
+	result = []
 	attempt1 = attempt.strip().split()
 	four_letter_list = []
-	four_letters = "that with have this will your from they know want been good much some time just"
+	four_letters = words #"that with have this will your from they know want been good much some time just"
 	i = 0
 	while i != len(attempt1):
 		if len(attempt1[i]) == 4 and not attempt1[i].isupper() and attempt1[i].isalpha():
@@ -739,100 +801,69 @@ def four_letter_word(attempt):
 ################################################
 	i = 0
 	k = 0
-	while k != 2: #####iterated twice over the list.
+	while k != 1: #####iterated twice over the list.
 		i = 0
 		while i != len(new_list):
+			can_pass = 0
 			letter_1 = new_list[i][0]
 			letter_2 = new_list[i][1]
 			letter_3 = new_list[i][2]
 			letter_4 = new_list[i][3]
 			#print(new_list[i])
 
+
 #Triple case 1: One lower case on the far left and all other are upper.
 			if letter_2.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
 				regex = r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + re.escape(letter_4.lower())
 				result = re.findall(regex , four_letters)
+				position = 0
+				can_pass = 1
 				#print(result)
-
-				if len(result) != 0:
-					j = 0
-					while result[j][0].upper() in used_letters and j < len(result) -1:
-						j = j + 1
-
-					if result[j][0].upper() not in used_letters:
-						char = (result[j][0]).upper()
-						used_list.append(result[j])
-						attempt = attempt.replace(letter_1, char)
-						string = " ". join(new_list)
-						new_list = (string.replace(letter_1, char)).strip().split()
-						if char not in used_letters:
-							used_letters.append(char)
 
 #Triple case 2: Upper on the far left followed by a lower then two uppers.
-			if letter_1.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
+			elif letter_1.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
 				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower()) + re.escape(letter_4.lower())
 				result = re.findall(regex , four_letters)
+				position = 1
+				can_pass = 1
 				#print(result)
-
-				if len(result) != 0:
-					j = 0
-					while result[j][1].upper() in used_letters and j < len(result) -1:
-						j = j + 1
-
-					if result[j][1].upper() not in used_letters:
-						char = (result[j][1]).upper()
-						used_list.append(result[j])
-						attempt = attempt.replace(letter_2, char)
-						string = " ". join(new_list)
-						new_list = (string.replace(letter_2, char)).strip().split()
-						if char not in used_letters:
-							used_letters.append(char)
 
 #Triple 3: two letters on the left are upper followed by a lower than an upper.
-			if letter_1.isupper() and letter_2.isupper() and letter_4.isupper() and not new_list[i].isupper():
+			elif letter_1.isupper() and letter_2.isupper() and letter_4.isupper() and not new_list[i].isupper():
 				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w" + re.escape(letter_4.lower())
 				result = re.findall(regex , four_letters)
+				position = 2
+				can_pass = 1
 				#print(result)
-
-				if len(result) != 0:
-					j = 0
-					while result[j][2].upper() in used_letters and j < len(result) -1:
-						j = j + 1
-
-					if result[j][2].upper() not in used_letters:
-						char = (result[j][2]).upper()
-						used_list.append(result[j])
-						attempt = attempt.replace(letter_3, char)
-						string = " ". join(new_list)
-						new_list = (string.replace(letter_3, char)).strip().split()
-						if char not in used_letters:
-							used_letters.append(char)
 
 #Triple 4: three letters on the left are upper followed by a lower.
-			if letter_1.isupper() and letter_2.isupper() and letter_3.isupper() and not new_list[i].isupper():
+			elif letter_1.isupper() and letter_2.isupper() and letter_3.isupper() and not new_list[i].isupper():
 				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + r"\w"
 				result = re.findall(regex , four_letters)
+				position = 3
+				can_pass = 1
 				#print(result)
 
-				if len(result) != 0:
-					j = 0
-					while result[j][3].upper() in used_letters and j < len(result) -1:
-						j = j + 1
+			if len(result) != 0 and can_pass == 1:
+				j = 0
+				while result[j][position].upper() in used_letters and j < len(result) -1:
+					j = j + 1
 
-					if result[j][3].upper() not in used_letters:
-						char = (result[j][3]).upper()
-						used_list.append(result[j])
-						attempt = attempt.replace(letter_4, char)
-						string = " ". join(new_list)
-						new_list = (string.replace(letter_4, char)).strip().split()
-						if char not in used_letters:
-							used_letters.append(char)
+				if result[j][position].upper() not in used_letters:
+					char = (result[j][position]).upper()
+					used_list.append(result[j])
+					attempt = attempt.replace(new_list[i][position], char)
+					string = " ". join(new_list)
+					new_list = (string.replace(new_list[i][position], char)).strip().split()
+					if char not in used_letters:
+						used_letters.append(char)
 
 			i = i + 1
-#			#print(new_list)
-#			#print(used_list)
-#			#print(used_letters)
-#			#print("------------------------------------------------------------------")
+			#print(new_list)
+			#print(result)
+			#print(used_list)
+			#print(used_letters)
+			#print("------------------------------------------------------------------")
 		k = k + 1
 #
 #	#print(upper_list)
@@ -941,7 +972,7 @@ def finding_H_by_THE(attempt):
 	last_letter = []
 
 	for word in attempt1:
-		if len(word) == 3 and word[0] == "T" and word[2] == "E" and not word.isupper() and word.isalpha():
+		if len(word) == 3 and word[2] == "E" and not word.isupper() and word.isalpha():
 			T_E.append(word)
 
 	freq = frequency_analysis(T_E)
@@ -950,39 +981,2312 @@ def finding_H_by_THE(attempt):
 		attempt = attempt.replace(most_freq[0][1], "H")
 		if "H" not in used_letters:
 			used_letters.append("H")
+		attempt = attempt.replace(most_freq[0][0], "T")
+		if "T" not in used_letters:
+			used_letters.append("T")
 
 
 	#print(most_freq)
 	return attempt
 
+def ending_ED(attempt):
+	attempt1 = attempt.strip().split()
+	ED = []
+	last_letter = []
 
+	for word in attempt1:
+		if len(word) >= 3 and word[len(word) - 2] == "E" and not word.isupper() and word.isalpha():
+			ED.append(word)
+			last_letter.append(word[len(word) - 1])
+
+	freq = frequency_analysis(last_letter)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+
+
+	if len(most_freq) > 0:
+		attempt = attempt.replace(most_freq[0], "D")
+		if "D" not in used_letters:
+			used_letters.append("D")
+
+	return attempt
+
+def findind_AND(attempt):
+	attempt1 = attempt.strip().split()
+	AND = []
+	last_letter = []
+
+	for word in attempt1:
+		if len(word) == 3 and word[2] == "D" and not word.isupper() and word.isalpha():
+			AND.append(word)
+	#print(AND)
+
+	freq = frequency_analysis(AND)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+	#print(most_freq)
+
+	if len(most_freq) > 0:
+		attempt = attempt.replace(most_freq[0][0], "A")
+		if "A" not in used_letters:
+			used_letters.append("A")
+
+		attempt = attempt.replace(most_freq[0][1], "N")
+		if "N" not in used_letters:
+			used_letters.append("N")
+	return attempt
+
+def ending_ing_2(attempt):
+	attempt1 = attempt.strip().split()
+	ING = []
+	last_letter = []
+	third_last_letter = []
+
+	for word in attempt1:
+		if len(word) > 3 and word[len(word) - 2] == "N" and not word.isupper() and word.isalpha():
+			ING.append(word)
+			last_letter.append(word[len(word) - 1])
+			third_last_letter.append(word[len(word) - 3])
+	#print(ING)
+	#print(last_letter)
+	#print(third_last_letter)
+
+	freq_last_letter = frequency_analysis(last_letter)
+	freq_third_last_letter = frequency_analysis(third_last_letter)
+	most_freq_last_letter = sorted(freq_last_letter,key=freq_last_letter.get, reverse=True)
+	most_freq_third_last_letter = sorted(freq_third_last_letter,key=freq_third_last_letter.get, reverse=True)
+	#print(most_freq_last_letter)
+	#print(most_freq_third_last_letter)
+
+	if len(most_freq_last_letter) > 0:
+		attempt = attempt.replace(most_freq_last_letter[0], "G")
+		if "G" not in used_letters:
+			used_letters.append("G")
+
+	if len(most_freq_third_last_letter) > 0:
+		attempt = attempt.replace(most_freq_third_last_letter[0], "I")
+		if "I" not in used_letters:
+			used_letters.append("I")
+
+	return attempt
+
+def ending_ER(attempt):
+	attempt1 = attempt.strip().split()
+	ER = []
+	last_letter = []
+
+	for word in attempt1:
+		if len(word) >= 3 and word[len(word) - 2] == "E" and word[len(word) - 1].islower() and not word.isupper() and word.isalpha():
+			ER.append(word)
+			last_letter.append(word[len(word) - 1])
+
+	freq = frequency_analysis(last_letter)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+	#print(ER)
+
+	if len(most_freq) > 0:
+		attempt = attempt.replace(most_freq[0][len(most_freq[0]) - 1], "R")
+		if "R" not in used_letters:
+			used_letters.append("R")
+
+	return attempt
+
+def bigram_T(attempt):
+	if "A" in used_letters:
+		return attempt
+
+	attempt1 = attempt.strip().split()
+	bigrams_options_after = ["A"]
+	bigrams_options_before = ["T"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "H" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("H") >= 2:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+		elif word.count("H") == 1:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) -2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0:
+		i = 0
+		j = 0
+		while i < len(bigrams_options_after):
+			if not most_freq_2[i].isupper():
+
+				if len(most_freq_2) == 1:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+
+				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options_after)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+	if len(most_freq_1) > 0:
+			if len(most_freq_1) == 1:
+				attempt = attempt.replace(most_freq_1[0], bigrams_options_before[0])
+				if bigrams_options_before[0] not in used_letters:
+					used_letters.append(bigrams_options_before[0])
+
+			else:
+				i = 0
+				j = 0
+				while i < len(bigrams_options_before):
+					if not most_freq_1[i].isupper():
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+							if bigrams_options_before[i] not in used_letters:
+								used_letters.append(bigrams_options_before[i])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options_before)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def ending_LY(attempt):
+	attempt1 = attempt.strip().split()
+	LY = []
+	last_letter = []
+
+	for word in attempt1:
+		if len(word) >= 3 and word[len(word) - 2] == "L" and word[len(word) - 1].islower() and not word.isupper() and word.isalpha():
+			LY.append(word)
+			last_letter.append(word[len(word) - 1])
+	#print(LY)
+	#print(last_letter)
+
+	freq = frequency_analysis(last_letter)
+	most_freq = sorted(freq,key=freq.get, reverse=True)
+	#print(LY)
+
+	if len(most_freq) > 0:
+		attempt = attempt.replace(most_freq[0], "Y")
+		if "Y" not in used_letters:
+			used_letters.append("Y")
+
+	return attempt
+
+def bigram_E(attempt):
+	if "H" in used_letters and "R" in used_letters:
+		return attempt
+	attempt1 = attempt.strip().split()
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "E" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("E") >= 2:
+			for letter in word:
+				if letter == "E":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("E") == 1:
+			for letter in word:
+				if letter == "E":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+	#print(letter_before)
+	#print(letter_after)
+
+
+	if "H" not in used_letters:
+		freq = frequency_analysis(letter_before)
+		most_freq_1 = sorted(freq,key=freq.get, reverse=True)
+		#print("Most Freq Before")
+
+		#print(most_freq_1)
+
+		attempt = attempt.replace(most_freq_1[0], "H")
+		if "H" not in used_letters:
+			used_letters.append("H")
+
+	freq = frequency_analysis(letter_after)
+	most_freq_2 = sorted(freq,key=freq.get, reverse=True)
+	for letter in most_freq_2:
+		if letter.isupper():
+			most_freq_2.remove(letter)
+	#print("Most Freq After")
+	#print(most_freq_2)
+
+	attempt = attempt.replace(most_freq_2[0], "R")
+	if "R" not in used_letters:
+		used_letters.append("R")
+
+	return attempt
+
+
+def trigram(attempt):
+	attempt1 = attempt.strip().split()
+	trigram_options = "the and ing ent ion her for tha nth int ere tio ter est ers ati hat ate all eth hes ver his oft ith fth sth oth res ont"
+	trigram_text = []
+
+	i = 0
+	while i != len(attempt1):
+		if len(attempt1[i]) == 3 and not attempt1[i].isupper() and (attempt1[i]).isalpha():
+			trigram_text.append(attempt1[i])
+			freq = frequency_analysis(trigram_text)
+			most_freq = sorted(freq,key=freq.get, reverse=True)
+		i = i + 1
+
+	#print(most_freq)
+
+	n = 0
+	upper_list = []
+	lower_list = []
+	for word in most_freq:
+		first = word[0]
+		second = word[1]
+		third = word[2]
+		#print(word)
+		if (first.isupper() or second.isupper() or third.isupper()) and word.isalpha():#########
+			upper_list.append(word)
+		else:
+			lower_list.append(word)
+	new_list = upper_list + lower_list
+	#print(new_list)
+################################################
+	i = 0
+	k = 0
+	while k != 2: #####iterated twice over the list.
+		i = 0
+		while i != len(new_list):
+			letter_1 = new_list[i][0]
+			letter_2 = new_list[i][1]
+			letter_3 = new_list[i][2]
+			print(new_list[i])
+
+#Double case 1: One capital on the left and centre.
+			if letter_1 == (letter_1).upper() and letter_2 == (letter_2).upper() and new_list[i] != new_list[i].upper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w"
+				result = re.findall(regex , trigram_options)
+				print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][2].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][2].upper() not in used_letters:
+						char = (result[j][2]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_3, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_3, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
+#Double case 2: One capital on the left and far right.
+			elif letter_1 == (letter_1).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
+				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower())
+				result = re.findall(regex , trigram_options)
+				#print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][1].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][1].upper() not in used_letters:
+						char = (result[j][1]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_2, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_2, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+
+#Double case 3: One capital in the centre and far right.
+			elif letter_2 == (letter_2).upper() and letter_3 == (letter_3).upper() and new_list[i] != new_list[i].upper():
+				regex =  r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower())
+				result = re.findall(regex , trigram_options)
+				#print(result)
+
+				if len(result) != 0:
+					j = 0
+					while result[j][0].upper() in used_letters and j < len(result) -1:
+						j = j + 1
+
+					if result[j][0].upper() not in used_letters:
+						char = (result[j][0]).upper()
+						used_list.append(result[j])
+						attempt = attempt.replace(letter_1, char)
+						string = " ". join(new_list)
+						new_list = (string.replace(letter_1, char)).strip().split()
+						if char not in used_letters:
+							used_letters.append(char)
+			i = i + 1
+			#print(new_list)
+			#print(used_list)
+			#print(used_letters)
+			#print("------------------------------------------------------------------")
+		k = k + 1
+
+	#print(upper_list)
+	#print(lower_list)
+	#print(used_list)
+	#print(new_list)
+
+	#return attempt
+
+def bigram_I(attempt, freq_single_letters):
+	if "I" not in used_letters:
+		return attempt
+	attempt1 = attempt.strip().split()
+	bigrams_options = ["N"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "I" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("I") >= 2:
+			for letter in word:
+				if letter == "I":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("I") == 1:
+			for letter in word:
+				if letter == "I":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+
+	freq_1 = frequency_analysis(letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(bigrams_text)
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0:
+		i = 0
+		j = 0
+		while i < len(bigrams_options):
+			if not most_freq_2[i].isupper():
+				if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+					if bigrams_options[i] not in used_letters:
+						used_letters.append(bigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+			i = i + 1
+			j = j + 1
+
+
+	return attempt
+
+
+def bigram_N(attempt,freq_single_letters):
+#	if "A" in used_letters:
+#		return attempt
+
+	attempt1 = attempt.strip().split()
+	bigrams_options_after = ["O"]
+	bigrams_options_before = ["I", "O"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "N" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("N") >= 2:
+			for letter in word:
+				if letter == "N":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+		elif word.count("N") == 1:
+			for letter in word:
+				if letter == "N":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) -2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+#	if len(most_freq_2) > 0:
+#		i = 0
+#		j = 0
+#		while i < len(bigrams_options_after):
+#			if not most_freq_2[i].isupper():
+#
+#				if len(most_freq_2) == 1:
+#					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+#					if bigrams_options_after[i] not in used_letters:
+#						used_letters.append(bigrams_options_after[i])
+#
+#
+#				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+#					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+#					if bigrams_options_after[i] not in used_letters:
+#						used_letters.append(bigrams_options_after[i])
+#
+#				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+#					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+#						attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+#						if bigrams_options_after[i] not in used_letters:
+#							used_letters.append(bigrams_options_after[i])
+#
+#					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+#						j = j + 1
+#						#print(i)
+#						#print(bigrams_options_after)
+#						attempt = attempt.replace(most_freq_2[j], bigrams_options_after[i])
+#						if bigrams_options_after[i] not in used_letters:
+#							used_letters.append(bigrams_options_after[i])
+#
+#			elif most_freq_2[j].isupper():
+#				i = i - 1
+#
+#			i = i + 1
+#			j = j + 1
+
+	if len(most_freq_1) > 0:
+			if len(most_freq_1) == 1 and bigrams_options_before[i] not in used_letters:
+				if bigrams_options_before[0] not in used_letters:
+					attempt = attempt.replace(most_freq_1[0], bigrams_options_before[0])
+					if bigrams_options_before[0] not in used_letters:
+						used_letters.append(bigrams_options_before[0])
+
+			else:
+				i = 0
+				j = 0
+				k = 0
+				while i < len(bigrams_options_before) -1:
+					if not most_freq_1[i].isupper():
+						
+						while bigrams_options_before[k] in used_letters and k < len(bigrams_options_before) - 1:
+							k = k + 1
+
+
+
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options_before[k])
+							if bigrams_options_before[k] not in used_letters:
+								used_letters.append(bigrams_options_before[k])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options_before[k])
+								if bigrams_options_before[k] not in used_letters:
+									used_letters.append(bigrams_options_before[k])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options_before)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options_before[k])
+								if bigrams_options_before[k] not in used_letters:
+									used_letters.append(bigrams_options_before[k])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def bigram_L(attempt,freq_single_letters):
+	attempt1 = attempt.strip().split()
+	bigrams_options = ["L"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "A" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("A") >= 2:
+			for letter in word:
+				if letter == "A":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("A") == 1:
+			for letter in word:
+				if letter == "A":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0:
+		i = 0
+		j = 0
+		while i < len(bigrams_options):
+			if not most_freq_2[i].isupper():
+				if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+					if bigrams_options[i] not in used_letters:
+						used_letters.append(bigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+
+	return attempt
+
+def ending_ing(attempt):
+	attempt1 = attempt.strip().split()
+	trigrams_options = ["G"]
+	trigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) > 3 and "IN" in word and not word.isupper() and word.isalpha():
+			trigrams_text.append(word)
+
+	#print(trigrams_text)
+	for word in trigrams_text:
+		index = 0
+		if word.count("IN") >= 2:
+			for letter in word:
+				if letter == "I":
+					if index == 0:
+						letter_after.append(word[index + 2]) 
+
+					elif index <= len(word) - 3:
+						letter_after.append(word[index + 2])
+
+				index = index + 1
+
+		elif word.count("IN") == 1:
+			for letter in word:
+				if letter == "I":
+					if index == 0:
+						letter_after.append(word[index + 2])
+
+					elif index <= len(word) - 3:
+						letter_after.append(word[index + 2])
+
+				index = index + 1
+	#print(trigrams_text)
+	#print(letter_after)
+	#print(letter_before)
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+
+	if len(most_freq_2) > 0:
+		i = 0
+		j = 0
+		while i < len(trigrams_options):
+			if not most_freq_2[i].isupper():
+				if len(most_freq_2) == 1:
+					attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+					if trigrams_options[i] not in used_letters:
+						used_letters.append(trigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+					if trigrams_options[i] not in used_letters:
+						used_letters.append(trigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(trigrams_options)
+						attempt = attempt.replace(most_freq_2[j], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+
+	return attempt
+
+def trigrams_AND(attempt):
+	attempt1 = attempt.strip().split()
+	trigrams_options = ["D"]
+	trigrams_text = []
+	letter_after = []
+	new_letter_after = []
+
+	if "D" not in used_letters:
+		for word in attempt1:
+			if len(word) >= 3 and "AN" in word and not word.isupper() and word.isalpha():
+				trigrams_text.append(word)
+
+		#print(trigrams_text)
+		for word in trigrams_text:
+			index = 0
+			if word.count("AN") >= 2:
+				for letter in word:
+					if letter == "A":
+						if index == 0:
+							letter_after.append(word[index + 2]) 
+
+						elif index <= len(word) - 3:
+							letter_after.append(word[index + 2])
+
+					index = index + 1
+
+			elif word.count("AN") == 1:
+				for letter in word:
+					if letter == "A":
+						if index == 0:
+							letter_after.append(word[index + 2])
+
+						elif index <= len(word) - 3:
+							letter_after.append(word[index + 2])
+
+					index = index + 1
+		#print(trigrams_text)
+		#print(letter_after)
+		#print(letter_before)
+
+		for word in letter_after:
+			if word.islower():
+				new_letter_after.append(word)
+
+		freq_2 = frequency_analysis(new_letter_after)
+		most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+		#print(most_freq_2)
+		#print(freq_2)
+		#print("________________________________________________________________________")
+
+
+		if len(most_freq_2) > 0:
+			i = 0
+			j = 0
+			while i < len(trigrams_options):
+				if not most_freq_2[i].isupper():
+					if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+						attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+					elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+						if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+							attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+						elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+							j = j + 1
+							#print(i)
+							#print(trigrams_options)
+							attempt = attempt.replace(most_freq_2[j], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+				elif most_freq_2[j].isupper():
+					i = i - 1
+
+				i = i + 1
+				j = j + 1
+
+
+	return attempt
+
+def trigrams_FOR(attempt):
+	attempt1 = attempt.strip().split()
+	trigrams_options = ["F"]
+	trigrams_text = []
+	letter_before = []
+	new_letter_before = []
+
+	for word in attempt1:
+		if len(word) >= 3 and "OR" in word and not word.isupper() and word.isalpha():
+			trigrams_text.append(word)
+
+	#print(trigrams_text)
+	for word in trigrams_text:
+		index = 0
+		if word.count("OR") >= 2:
+			for letter in word:
+				if letter == "O":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("OR") == 1:
+			for letter in word:
+				if letter == "O":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+				index = index + 1
+	#print(trigrams_text)
+	#print(letter_before)
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	freq_2 = frequency_analysis(new_letter_before)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	if len(most_freq_2) > 0:
+		if len(most_freq_2) == 1:
+			attempt = attempt.replace(most_freq_2[0], trigrams_options[0])
+			if trigrams_options[0] not in used_letters:
+				used_letters.append(trigrams_options[0])
+
+		else:
+			i = 0
+			j = 0
+			while i < len(trigrams_options):
+				if not most_freq_2[i].isupper():
+					if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+						attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+					elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+						if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+							attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+						elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+							j = j + 1
+							#print(i)
+							#print(trigrams_options)
+							attempt = attempt.replace(most_freq_2[j], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+				elif most_freq_2[j].isupper():
+					i = i - 1
+
+				i = i + 1
+				j = j + 1
+
+
+	return attempt
+
+def bigram_T(attempt):
+	if "S" in used_letters and "H" in used_letters:
+		return attempt
+
+	attempt1 = attempt.strip().split()
+	bigrams_options_after = ["H"]
+	bigrams_options_before = ["S"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "T" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("T") >= 2:
+			for letter in word:
+				if letter == "T":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+		elif word.count("T") == 1:
+			for letter in word:
+				if letter == "T":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0 and "H" not in used_letters:
+		i = 0
+		j = 0
+		while i < len(bigrams_options_after):
+			if not most_freq_2[i].isupper():
+
+				if len(most_freq_2) == 1:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+
+				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options_after)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+	if len(most_freq_1) > 0 and "S" not in used_letters:
+			if len(most_freq_1) == 1:
+				attempt = attempt.replace(most_freq_1[0], bigrams_options_before[0])
+				if bigrams_options_before[0] not in used_letters:
+					used_letters.append(bigrams_options_before[0])
+
+			else:
+				i = 0
+				j = 0
+				while i < len(bigrams_options_before):
+					if not most_freq_1[i].isupper():
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+							if bigrams_options_before[i] not in used_letters:
+								used_letters.append(bigrams_options_before[i])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options_before)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def trigrams_VER(attempt):
+	attempt1 = attempt.strip().split()
+	trigrams_options = ["V"]
+	trigrams_text = []
+	letter_before = []
+	new_letter_before = []
+
+	for word in attempt1:
+		if len(word) >= 3 and "ER" in word and not word.isupper() and word.isalpha():
+			trigrams_text.append(word)
+
+	#print(trigrams_text)
+	for word in trigrams_text:
+		index = 0
+		if word.count("ER") >= 2:
+			for letter in word:
+				if letter == "O":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("ER") == 1:
+			for letter in word:
+				if letter == "E":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+				index = index + 1
+	print(trigrams_text)
+	print(letter_before)
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	freq_2 = frequency_analysis(new_letter_before)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	if len(most_freq_2) > 0:
+		if len(most_freq_2) == 1:
+			attempt = attempt.replace(most_freq_2[0], trigrams_options[0])
+			if trigrams_options[0] not in used_letters:
+				used_letters.append(trigrams_options[0])
+
+		else:
+			i = 0
+			j = 0
+			while i < len(trigrams_options):
+				if not most_freq_2[i].isupper():
+					if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+						attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+					elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+						if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+							attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+						elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+							j = j + 1
+							#print(i)
+							#print(trigrams_options)
+							attempt = attempt.replace(most_freq_2[j], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+				elif most_freq_2[j].isupper():
+					i = i - 1
+
+				i = i + 1
+				j = j + 1
+
+
+	return attempt
+
+def quadgram_WITH(attempt):
+	attempt1 = attempt.strip().split()
+	trigrams_options = ["W"]
+	trigrams_text = []
+	letter_before = []
+	new_letter_before = []
+
+	for word in attempt1:
+		if len(word) >= 4 and "ITH" in word and not word.isupper() and word.isalpha():
+			trigrams_text.append(word)
+
+	#print(trigrams_text)
+	for word in trigrams_text:
+		index = 0
+		if word.count("ITH") >= 2:
+			for letter in word:
+				if letter == "I":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("ITH") == 1:
+			for letter in word:
+				if letter == "I":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+				index = index + 1
+	#print(trigrams_text)
+	#print(letter_before)
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	freq_2 = frequency_analysis(new_letter_before)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	if len(most_freq_2) > 0:
+		if len(most_freq_2) == 1:
+			attempt = attempt.replace(most_freq_2[0], trigrams_options[0])
+			if trigrams_options[0] not in used_letters:
+				used_letters.append(trigrams_options[0])
+
+		else:
+			i = 0
+			j = 0
+			while i < len(trigrams_options):
+				if not most_freq_2[i].isupper():
+					if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+						attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+						if trigrams_options[i] not in used_letters:
+							used_letters.append(trigrams_options[i])
+
+					elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+						if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+							attempt = attempt.replace(most_freq_2[i], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+						elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+							j = j + 1
+							#print(i)
+							#print(trigrams_options)
+							attempt = attempt.replace(most_freq_2[j], trigrams_options[i])
+							if trigrams_options[i] not in used_letters:
+								used_letters.append(trigrams_options[i])
+
+				elif most_freq_2[j].isupper():
+					i = i - 1
+
+				i = i + 1
+				j = j + 1
+
+
+	return attempt
+
+def five_letter_word(attempt, words):
+	most_freq = ""
+	result = []
+	attempt1 = attempt.strip().split()
+	five_letter_list = []
+	five_letters = words #"that with have this will your from they know want been good much some time just"
+	i = 0
+	while i != len(attempt1):
+		if len(attempt1[i]) == 5 and not attempt1[i].isupper() and attempt1[i].isalpha():
+			five_letter_list.append(attempt1[i])
+			freq_4 = frequency_analysis(five_letter_list)
+			most_freq = sorted(freq_4,key=freq_4.get, reverse=True)
+		i = i + 1
+
+	#print(most_freq)
+	n = 0
+	upper_list = []
+	lower_list = []
+	for word in most_freq:
+		first = word[0]
+		second = word[1]
+		third = word[2]
+		fourth = word[3]
+		fifth = word[4]
+		#print(word)
+		if (first.isupper() or second.isupper() or third.isupper() or fourth.isupper()) or fifth.isupper() and word.isalpha():#########
+			upper_list.append(word)
+		else:
+			lower_list.append(word)
+	new_list = upper_list + lower_list
+################################################
+	i = 0
+	k = 0
+	while k != 2: #####iterated twice over the list.
+		i = 0
+		while i != len(new_list):
+			letter_1 = new_list[i][0]
+			letter_2 = new_list[i][1]
+			letter_3 = new_list[i][2]
+			letter_4 = new_list[i][3]
+			letter_5 = new_list[i][4]
+			#print(new_list[i])
+
+#Triple case 1: One lower case on the far left and all other are upper.
+			if letter_2.isupper() and letter_3.isupper() and letter_4.isupper() and letter_5.isupper() and not new_list[i].isupper():
+				regex = r"\w" + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + re.escape(letter_4.lower()) + re.escape(letter_5.lower())
+				result = re.findall(regex , five_letters)
+				position = 0
+				#print(result)
+
+#Triple case 2: Upper on the far left followed by a lower then two uppers.
+			elif letter_1.isupper() and letter_3.isupper() and letter_4.isupper() and letter_5.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + r"\w" + re.escape(letter_3.lower()) + re.escape(letter_4.lower()) + re.escape(letter_5.lower())
+				result = re.findall(regex , five_letters)
+				position = 1
+				#print(result)
+
+#Triple 3: two letters on the left are upper followed by a lower than an upper.
+			elif letter_1.isupper() and letter_2.isupper() and letter_4.isupper() and letter_5.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + r"\w" + re.escape(letter_4.lower()) + re.escape(letter_5.lower())
+				result = re.findall(regex , five_letters)
+				position = 2
+				#print(result)
+
+#Triple 4: three letters on the left are upper followed by a lower.
+			elif letter_1.isupper() and letter_2.isupper() and letter_3.isupper() and letter_5.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + r"\w" + re.escape(letter_5.lower())
+				result = re.findall(regex , five_letters)
+				position = 3
+				#print(result)
+
+#Triple 5: three letters on the left are upper followed by a lower.
+			elif letter_1.isupper() and letter_2.isupper() and letter_3.isupper() and letter_4.isupper() and not new_list[i].isupper():
+				regex = re.escape(letter_1.lower()) + re.escape(letter_2.lower()) + re.escape(letter_3.lower()) + re.escape(letter_4.lower()) + r"\w"
+				result = re.findall(regex , five_letters)
+				position = 4
+				#print(result)
+
+
+
+			if len(result) != 0:
+				j = 0
+				while result[j][position].upper() in used_letters and j < len(result) -1:
+					j = j + 1
+
+				if result[j][position].upper() not in used_letters:
+					char = (result[j][position]).upper()
+					used_list.append(result[j])
+					attempt = attempt.replace(new_list[i][position], char)
+					string = " ". join(new_list)
+					new_list = (string.replace(new_list[i][position], char)).strip().split()
+					if char not in used_letters:
+						used_letters.append(char)
+
+
+			i = i + 1
+#			#print(new_list)
+#			#print(used_list)
+#			#print(used_letters)
+#			#print("------------------------------------------------------------------")
+		k = k + 1
+#
+#	#print(upper_list)
+#	#print(lower_list)
+#	#print(used_list)
+#	#print(new_list)
+#
+	return attempt
+
+def bigram_AT(attempt):
+	if "I" in used_letters:
+		return attempt
+
+	attempt1 = attempt.strip().split()
+	bigrams_options = ["A"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "T" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("T") >= 2:
+			for letter in word:
+				if letter == "T":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+#
+#					else:
+#						letter_after.append(word[index + 1])
+#						letter_before.append(word[index - 1])
+#
+				index = index + 1
+
+		elif word.count("T") == 1:
+			for letter in word:
+				if letter == "T":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) -2:
+						letter_after.append(word[index + 1])
+
+#					else:
+#						letter_after.append(word[index + 1])
+#						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_1) > 0:
+		i = 0
+		j = 0
+		while i < len(bigrams_options):
+			if not most_freq_1[i].isupper():
+				if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+					attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+					if bigrams_options[i] not in used_letters:
+						used_letters.append(bigrams_options[i])
+
+				elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+					if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+					elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options)
+						attempt = attempt.replace(most_freq_1[j], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+			elif most_freq_1[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+	if "A" not in used_letters:
+		i = 0
+		j = 0
+		while i < len(bigrams_options):
+			if not most_freq_2[i].isupper():
+				if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+					if bigrams_options[i] not in used_letters:
+						used_letters.append(bigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+
+	return attempt
+
+def bigram_H(attempt):
+	attempt1 = attempt.strip().split()
+	bigrams_options_after = ["A"]
+	bigrams_options_before = ["T"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "H" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("H") >= 2:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+		elif word.count("H") == 1:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					elif index <= len(word) -2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0 and "A" not in used_letters:
+		i = 0
+		j = 0
+		while i < len(bigrams_options_after):
+			if not most_freq_2[i].isupper():
+
+				if len(most_freq_2) == 1:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+
+				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options_after)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+	if len(most_freq_1) > 0 and "T" not in used_letters:
+			if len(most_freq_1) == 1:
+				attempt = attempt.replace(most_freq_1[0], bigrams_options_before[0])
+				if bigrams_options_before[0] not in used_letters:
+					used_letters.append(bigrams_options_before[0])
+
+			else:
+				i = 0
+				j = 0
+				while i < len(bigrams_options_before):
+					if not most_freq_1[i].isupper():
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+							if bigrams_options_before[i] not in used_letters:
+								used_letters.append(bigrams_options_before[i])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options_before)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options_before[i])
+								if bigrams_options_before[i] not in used_letters:
+									used_letters.append(bigrams_options_before[i])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def bigram_AN(attempt,freq_single_letters):
+	attempt1 = attempt.strip().split()
+	bigrams_options = ["N"]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "A" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("A") >= 2:
+			for letter in word:
+				if letter == "A":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+		elif word.count("A") == 1:
+			for letter in word:
+				if letter == "A":
+					if index == 0:
+						letter_after.append(word[index + 1]) 
+
+					elif index == len(word) -1:
+						letter_before.append(word[index - 1])
+
+					else:
+						letter_after.append(word[index + 1])
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0:
+		i = 0
+		j = 0
+		while i < len(bigrams_options):
+			if not most_freq_2[i].isupper():
+				if freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+					if bigrams_options[i] not in used_letters:
+						used_letters.append(bigrams_options[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options[i])
+						if bigrams_options[i] not in used_letters:
+							used_letters.append(bigrams_options[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+
+	return attempt
+
+def bigram_TO(attempt):
+	attempt1 = attempt.strip().split()
+	bigrams_text = []
+	bigrams_options = ["O"]
+	letter_after = []
+	new_letter_after = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "T" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("T") >= 2:
+			for letter in word:
+				if letter == "T":
+					if index <= len(word) - 2:
+						letter_after.append(word[index + 1]) 
+
+				index = index + 1
+
+		elif word.count("T") == 1:
+			for letter in word:
+				if letter == "T":
+					if index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+				index = index + 1
+
+	#print(letter_after)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+
+	freq_1 = frequency_analysis(new_letter_after)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+	#print(most_freq_1)
+
+	if len(most_freq_1) > 0:
+			if len(most_freq_1) == 1:
+				attempt = attempt.replace(most_freq_1[0], bigrams_options[0])
+				if bigrams_options[0] not in used_letters:
+					used_letters.append(bigrams_options[0])
+
+			else:
+				i = 0
+				j = 0
+				while i < len(bigrams_options):
+					if not most_freq_1[i].isupper():
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+							if bigrams_options[i] not in used_letters:
+								used_letters.append(bigrams_options[i])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+								if bigrams_options[i] not in used_letters:
+									used_letters.append(bigrams_options[i])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options[i])
+								if bigrams_options[i] not in used_letters:
+									used_letters.append(bigrams_options[i])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def b(attempt):
+	attempt1 = attempt.strip().split()
+	bigrams_text = []
+	bigrams_options = ["T"]
+	letter_before = []
+	new_letter_before = []
+
+	for word in attempt1:
+		if len(word) >= 2 and "H" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("H") >= 2:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+				index = index + 1
+
+		elif word.count("H") == 1:
+			for letter in word:
+				if letter == "H":
+					if index >= 1:
+						letter_before.append(word[index - 1])
+
+				index = index + 1
+
+	#print(letter_before)
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+	print(most_freq_1)
+	print(freq_1)
+
+	if len(most_freq_1) > 0:
+			if len(most_freq_1) == 1:
+				attempt = attempt.replace(most_freq_1[0], bigrams_options[0])
+				if bigrams_options[0] not in used_letters:
+					used_letters.append(bigrams_options[0])
+
+			else:
+				i = 0
+				j = 0
+				while i < len(bigrams_options):
+					if not most_freq_1[i].isupper():
+						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+							attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+							if bigrams_options[i] not in used_letters:
+								used_letters.append(bigrams_options[i])
+
+						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+								attempt = attempt.replace(most_freq_1[i], bigrams_options[i])
+								if bigrams_options[i] not in used_letters:
+									used_letters.append(bigrams_options[i])
+
+							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+								j = j + 1
+								#print(i)
+								#print(bigrams_options)
+								attempt = attempt.replace(most_freq_1[j], bigrams_options[i])
+								if bigrams_options[i] not in used_letters:
+									used_letters.append(bigrams_options[i])
+
+					elif most_freq_1[j].isupper():
+						i = i - 1
+
+					i = i + 1
+					j = j + 1
+
+
+	return attempt
+
+def bigram_ES(attempt):
+	attempt1 = attempt.strip().split()
+	bigrams_options_after = ["S"]
+	bigrams_options_before = [""]
+	bigrams_text = []
+	letter_before = []
+	letter_after = []
+	new_letter_before = []
+	new_letter_after = []
+	for word in attempt1:
+		if len(word) >= 2 and "E" in word and not word.isupper() and word.isalpha():
+			bigrams_text.append(word)
+
+	#print(bigrams_text)
+	for word in bigrams_text:
+		index = 0
+		if word.count("E") >= 2:
+			for letter in word:
+				if letter == "E":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					if index <= len(word) - 2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+		elif word.count("E") == 1:
+			for letter in word:
+				if letter == "E":
+					if index >= 1:
+						letter_before.append(word[index - 1]) 
+
+					if index <= len(word) -2:
+						letter_after.append(word[index + 1])
+
+
+				index = index + 1
+
+	for word in letter_before:
+		if word.islower():
+			new_letter_before.append(word)
+
+	for word in letter_after:
+		if word.islower():
+			new_letter_after.append(word)
+		#print(letter_after)
+
+	freq_1 = frequency_analysis(new_letter_before)
+	most_freq_1 = sorted(freq_1,key=freq_1.get, reverse=True)
+
+	freq_2 = frequency_analysis(new_letter_after)
+	most_freq_2 = sorted(freq_2,key=freq_2.get, reverse=True)
+
+
+	#print(most_freq_1)
+	#print(freq_1)
+	#print("________________________________________________________________________")
+	#print(most_freq_2)
+	#print(freq_2)
+	#print("________________________________________________________________________")
+
+	#print(freq_single_letters[most_freq_2[0]])
+	#print(freq_single_letters[most_freq_2[2]])
+
+	if len(most_freq_2) > 0 and "S" not in used_letters:
+		i = 0
+		j = 0
+		while i < len(bigrams_options_after):
+			if not most_freq_2[i].isupper():
+
+				if len(most_freq_2) == 1:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+
+				elif freq_2[most_freq_2[i]] > freq_2[most_freq_2[i + 1]]:
+					attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+					if bigrams_options_after[i] not in used_letters:
+						used_letters.append(bigrams_options_after[i])
+
+				elif freq_2[most_freq_2[i]] == freq_2[most_freq_2[i + 1]]:
+					if freq_single_letters[most_freq_2[i].lower()] > freq_single_letters[most_freq_2[i + 1].lower()]:
+						attempt = attempt.replace(most_freq_2[i], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+					elif freq_single_letters[most_freq_2[i].lower()] < freq_single_letters[most_freq_2[i + 1].lower()]:
+						j = j + 1
+						#print(i)
+						#print(bigrams_options_after)
+						attempt = attempt.replace(most_freq_2[j], bigrams_options_after[i])
+						if bigrams_options_after[i] not in used_letters:
+							used_letters.append(bigrams_options_after[i])
+
+			elif most_freq_2[j].isupper():
+				i = i - 1
+
+			i = i + 1
+			j = j + 1
+
+#	if len(most_freq_1) > 0 and "T" not in used_letters:
+#			if len(most_freq_1) == 1:
+#				attempt = attempt.replace(most_freq_1[0], bigrams_options_before[0])
+#				if bigrams_options_before[0] not in used_letters:
+#					used_letters.append(bigrams_options_before[0])
+#
+##			else:
+#				i = 0
+#				j = 0
+#				while i < len(bigrams_options_before):
+#					if not most_freq_1[i].isupper():
+#						if freq_1[most_freq_1[i]] > freq_1[most_freq_1[i + 1]]:
+#							attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+#							if bigrams_options_before[i] not in used_letters:
+#								used_letters.append(bigrams_options_before[i])
+#
+#						elif freq_1[most_freq_1[i]] == freq_1[most_freq_1[i + 1]]:
+#							if freq_single_letters[most_freq_1[i].lower()] > freq_single_letters[most_freq_1[i + 1].lower()]:
+#								attempt = attempt.replace(most_freq_1[i], bigrams_options_before[i])
+#								if bigrams_options_before[i] not in used_letters:
+#									used_letters.append(bigrams_options_before[i])
+#
+#							elif freq_single_letters[most_freq_1[i].lower()] < freq_single_letters[most_freq_1[i + 1].lower()]:
+#								j = j + 1
+								#print(i)
+#								#print(bigrams_options_before)
+#								attempt = attempt.replace(most_freq_1[j], bigrams_options_before[i])
+#								if bigrams_options_before[i] not in used_letters:
+#									used_letters.append(bigrams_options_before[i])
+#
+#					elif most_freq_1[j].isupper():
+#						i = i - 1
+#
+#					i = i + 1
+#					j = j + 1
+#
+
+	return attempt
 
 ##################################################################
 if __name__ == '__main__':
 	import time
 	start = time.perf_counter()
-	f = open("a_house_to_let.txt", "r")
+	f = open("brit.txt", "r")
 	encrypted_message = f.read()
 	attempt = encrypted_message.lower()
+	freq_single_letters = frequency_analysis(attempt)
+
+	dictionary = open("100_words_most_freq.txt", "r")
+	words = dictionary.read()#####change to .read
+
+	dictionary_2 = open("every_word.txt", "r")
+	big_words = dictionary_2.read()
+
+	words_3 = open("most_freq_three_letter.txt", "r")
+	three = words_3.read()
+
+	words_4 = open("most_freq_four_letter.txt", "r")
+	four = words_4.read()
+
+	words_5 = open("most_freq_five_letter.txt", "r")
+	five = words_5.read()
+
+	words_6 = open("most_freq_six_letter.txt", "r")
+	six = words_6.read()
+
+	word_10000 = open("10,000.txt", "r")
+	freq_big_words = word_10000.readlines()
+
+#	more_three = []
+#	more_four = []
+#	more_five = []
+##
+#	for word in freq_big_words:
+##		word = word.rstrip("\n")
+#		if len(word) == 3:
+###			more_three.append(word)
+#		if len(word) == 4:
+#			more_four.append(word)
+#		if len(word) == 5:
+#			more_five.append(word)
+#	
+#	for word in more_three:
+#		print(word)
+
+
+
+
 	used_letters = []
 	used_list = []
-	#print(freq_single_letters)	
+	#print(freq_single_letters)
+
 
 
 #Finding single letter words,[i,a], and check frequency pattern such as if there is full stop as "i" is more likely to appear at the beginning of sentences.
-	attempt = single_letter(attempt)
+	
+	attempt = single_letter(attempt, freq_single_letters)
 	attempt = single_letter_word(attempt)
-	attempt = single_letter_front_and_back(attempt)
+	attempt = strip_punctuation(attempt)
 	attempt = finding_H_by_THE(attempt)
-	attempt = two_letter_ending_in_A(attempt)
-	attempt = ending_een(attempt)
+	attempt = bigram_E(attempt)
+	attempt = bigram_H(attempt)
+	attempt = ending_ED(attempt)
+	############attempt = bigram_ES(attempt)
+	attempt = bigram_AN(attempt,freq_single_letters)
+	attempt = bigram_ES(attempt)
+	attempt = bigram_N(attempt,freq_single_letters)
+#########
+
+	##############attempt = bigram_T(attempt)###currrently doesn do anything
+	
+	attempt = bigram_I(attempt, freq_single_letters)
+	##################attempt = bigram_N(attempt,freq_single_letters)#already used prieviously
+	################attempt = bigram_T(attempt)#already used previously
+	attempt = ending_ing(attempt)
+	attempt = trigrams_AND(attempt)
+	attempt = trigrams_FOR(attempt)
+	attempt = quadgram_WITH(attempt)
+
+	for i in range(2):
+		attempt = two_letter_word(attempt)
+		########attempt = double_two_letters(attempt)###don't use
+		
+		attempt = three_letter_word_double_case(attempt, three)
+		attempt = four_letter_word(attempt, four)
+		attempt= five_letter_word(attempt, five)
+
+	#############attempt = bigram_L(attempt,freq_single_letters)
+	################attempt = q_followed_by_u(attempt)
+#############################################
+	#attempt = two_letter_word(attempt)
+	#attempt = three_letter_word_double_case(attempt, three)
+	#attempt= five_letter_word(attempt, five)
+	#attempt = four_letter_word(attempt, four)
+	#attempt = three_letter_word_double_case(attempt, big_words)
 
 
-	attempt = two_letter_word(attempt)
-	attempt = three_letter_word_double_case(attempt)
-	attempt = four_letter_word(attempt)
-	attempt = q_followed_by_u(attempt)
-	attempt = last_letter(attempt)
+
+	#attempt = double_two_letters(attempt)
+	#attempt = bigram_AN(attempt,freq_single_letters)
+	#attempt = bigram_TO(attempt)
+	#attempt = bigram_T(attempt)
+	#attempt = bigram_AT(attempt)
+	#attempt = bigram_I(attempt, freq_single_letters)
+	#attempt = q_followed_by_u(attempt)
+
+	#attempt = trigrams_VER(attempt)
+	#attempt = trigram(attempt)
+
+	#attempt = ending_ED(attempt)
+	#attempt = findind_AND(attempt)
+	#attempt = ending_ER(attempt)
+	#attempt = double_two_letters(attempt)
+	#attempt = ending_LY(attempt)
+
+
+
+	#attempt = ending_ANCE(attempt)
+	#attempt = word_TO(attempt)
+	#attempt = single_letter_word(attempt)
+	#attempt = single_letter_front_and_back(attempt)
+	#attempt = two_letter_ending_in_A(attempt)
+	#attempt = ending_een(attempt)
+
+	#attempt = q_followed_by_u(attempt)
+	#attempt = last_letter(attempt)
 
 	print(attempt)
 	print(used_list)
@@ -996,4 +3300,10 @@ if __name__ == '__main__':
 	finish = time.perf_counter()
 	#print("Start: ", start)
 	#print("Finish: ", finish)
+	alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	not_found = ""
+	for letter in alphabet:
+		if letter not in used_letters:
+			not_found = not_found + " " + letter
+	print("Letter(s) not found: " + not_found)
 	print(f"Finished in {round(finish-start, 2)} second(s)")
