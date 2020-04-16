@@ -150,11 +150,14 @@ def single_letter_word(attempt):
 
 	freq_of_one_letter_words = frequency_analysis(new_one_letter_word)
 	most_freq_2 = sorted(freq_of_one_letter_words,key=freq_of_one_letter_words.get, reverse=True)
+	#print(freq_single_letters)
 	#print(most_freq_2)
 	#print(most_freq)
+	#print("________________________________________________________________________")
 
 	if len(most_freq_2) > 0:
 		if most_freq_2[0] != "I":
+			#print("Hi")
 			attempt = attempt.replace("I", "---")
 			if len(most_freq) >= 2:
 				attempt = attempt.replace("A", "I")
@@ -306,7 +309,7 @@ def double_two_letters(attempt):
 	attempt1 = attempt.strip().split()
 	j = 0
 	double_letters = []
-	same_letters_list = ["ee", "ll", "ss", "oo", "tt", "ff" "rr", "nn", "pp", "cc"]
+	same_letters_list = ["ee", "ll", "ss", "oo", "tt", "ff" "rr", "nn", "pp"]
 	for word in attempt1:
 		i = 0
 		while i < len(word) -1:
@@ -3164,7 +3167,7 @@ def bigram_ES(attempt):
 if __name__ == '__main__':
 	import time
 	start = time.perf_counter()
-	f = open("brit.txt", "r")
+	f = open("going_into_society.txt", "r")
 	encrypted_message = f.read()
 	attempt = encrypted_message.lower()
 	freq_single_letters = frequency_analysis(attempt)
@@ -3242,11 +3245,11 @@ if __name__ == '__main__':
 
 	for i in range(2):
 		attempt = two_letter_word(attempt)
-		########attempt = double_two_letters(attempt)###don't use
+	attempt = double_two_letters(attempt)###don't use
 		
-		attempt = three_letter_word_double_case(attempt, three)
-		attempt = four_letter_word(attempt, four)
-		attempt= five_letter_word(attempt, five)
+	attempt = three_letter_word_double_case(attempt, three)
+	attempt = four_letter_word(attempt, four)
+	attempt= five_letter_word(attempt, five)
 
 	#############attempt = bigram_L(attempt,freq_single_letters)
 	################attempt = q_followed_by_u(attempt)
